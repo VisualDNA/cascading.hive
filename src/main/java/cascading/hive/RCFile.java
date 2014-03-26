@@ -21,7 +21,6 @@ import cascading.scheme.SourceCall;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;
 import cascading.tuple.Tuple;
-import cascading.tuple.type.CoercibleType;
 import org.apache.hadoop.hive.ql.io.RCFileInputFormat;
 import org.apache.hadoop.hive.ql.io.RCFileOutputFormat;
 import org.apache.hadoop.hive.serde2.ByteStream;
@@ -245,12 +244,7 @@ public class RCFile extends Scheme<JobConf, RecordReader, OutputCollector, Objec
         if (field == null) {
             return; // just leave it empty
         }
-        if (fieldType instanceof CoercibleType) {
-            CoercibleType<?> coercible = (CoercibleType<?>) fieldType;
-            out.write(coercible.coerce(field, String.class).toString().getBytes());
-        } else {
-            out.write(field.toString().getBytes());
-        }
+        out.write(field.toString().getBytes());
         //TODO: need handle more cases
     }
 
