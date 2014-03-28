@@ -33,6 +33,7 @@ import cascading.scheme.Scheme;
 import cascading.scheme.SinkCall;
 import cascading.scheme.SourceCall;
 import cascading.tap.Tap;
+import cascading.tap.hadoop.util.MeasuredRecordReader;
 import cascading.tuple.Fields;
 import cascading.tuple.Tuple;
 import cascading.tuple.TupleEntry;
@@ -67,8 +68,9 @@ public abstract class HCatScheme extends
 	private Table hiveTable;
 	private HCatSchema hCatSchema;
 	private Fields sourceFields;
+    private List<DataStorageLocation> locations;
 
-/**
+    /**
 	 * 
 	 * @param db
 	 * @param table
@@ -237,6 +239,10 @@ public abstract class HCatScheme extends
 	private boolean sourceReadInput(
 			SourceCall<Object[], RecordReader> sourceCall) throws IOException {
 		Object[] context = sourceCall.getContext();
+
+        System.err.println(context[0]);
+        System.err.println(context[1]);
+        RecordReader recordReader = ((MeasuredRecordReader) sourceCall.getInput()).getRecordReader();
 
 		return sourceCall.getInput().next(context[0], context[1]);
 	}

@@ -165,8 +165,10 @@ public class HCatTapTest {
         }
         assertTrue(count == 7);
 
-        List<String> location = CascadingHCatUtil.getDataStorageLocation(
-                MetaStoreUtils.DEFAULT_DATABASE_NAME, "test_orc", null, (JobConf) flow.getFlowProcess().getConfigCopy());
-        assertEquals(location.get(0), resultPath);
+        List<DataStorageLocation> location = CascadingHCatUtil.getDataStorageLocation(
+            MetaStoreUtils.DEFAULT_DATABASE_NAME, "test_orc", null, (JobConf) flow.getFlowProcess
+                ().getConfigCopy()
+        );
+        assertEquals(location.get(0).path, resultPath);
     }
 }

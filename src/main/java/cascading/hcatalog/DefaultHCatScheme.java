@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Expose the underlying table information, like the
@@ -51,8 +52,10 @@ import java.util.List;
  */
 public class DefaultHCatScheme extends HCatScheme {
 
-	public DefaultHCatScheme(String table) {
-		this(table, null, null, null);
+    private DataStorageLocation location = new DataStorageLocation();
+
+    public DefaultHCatScheme(String table) {
+        this(table, null, null, null);
 	}
 	
 	public DefaultHCatScheme(String table, String filter) {
@@ -70,18 +73,23 @@ public class DefaultHCatScheme extends HCatScheme {
 	public DefaultHCatScheme(String table, String filter, Fields sourceFields) {
 		this(null, table, filter, sourceFields);
 	}
-	
+
 	public DefaultHCatScheme(String db, String table, String filter, Fields sourceFields) {
 		super(db, table, filter, sourceFields);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * cascading.hcatalog.scheme.HCatScheme#getTableInputFormat(java.lang.String
-	 * , java.lang.String, java.lang.String, org.apache.hadoop.mapred.JobConf)
-	 */
+    public void setLocation(DataStorageLocation location) {
+        this.location = location;
+    }
+
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * cascading.hcatalog.scheme.HCatScheme#getTableInputFormat(java.lang.String
+     * , java.lang.String, java.lang.String, org.apache.hadoop.mapred.JobConf)
+     */
 	@Override
 	protected Class<? extends InputFormat> getTableInputFormat(Table table,
 			String filter, JobConf conf) {
@@ -118,15 +126,15 @@ public class DefaultHCatScheme extends HCatScheme {
 
 		try {
 			Object object = deserializer.deserialize((Writable) value);
-			HCatRecord record = new LazyHCatRecord(object,
-					deserializer.getObjectInspector());
+			HCatRecord hCatRecord = new LazyHCatRecord(object, deserializer.getObjectInspector());
+            HCatRecordWrapper record = new HCatRecordWrapper(hCatRecord, location.partitions);
 
 			Fields fields = getSourceFields();
 
 			for (int i = 0; i < fields.size(); i++) {
 				tuple.add(record.get((String) fields.get(i), hCatSchema));
 			}
-		} catch (Exception e) {
+        } catch (Exception e) {
 			throw new CascadeException(
 					"Error occured when deserializing value", e);
 		}
@@ -197,16 +205,24 @@ public class DefaultHCatScheme extends HCatScheme {
 			throw new CascadeException("Error occured when writing data out", e);
 		}
 	}
-//	
-//	private Object castField(Object field, Type from, String to) throws IOException, ClassNotFoundException {
-//        if (field == null) {
-//            return null; // just leave it empty
-//        }
-//        if (from instanceof CoercibleType) {
-//            CoercibleType<?> coercible = (CoercibleType<?>) from;
-//            return coercible.coerce(field, Class.forName(to));
-//        }
-//        
-//        return field;
-//    }
+
+    private class HCatRecordWrapper {
+        private final HCatRecord record;
+        private final Map<String, String> partitions;
+
+        private HCatRecordWrapper(HCatRecord record, Map<String, String> partitions) {
+            this.record = record;
+            this.partitions = partitions;
+        }
+
+        public Object get(String fieldName, HCatSchema schema) {
+            if(partitions.containsKey(fieldName)) {
+                return partitions.get(fieldName);
+            } else {
+                int idx = schema.getPosition(fieldName) - partitions.size();
+                return record.get(idx);
+            }
+        }
+    }
+
 }

@@ -42,6 +42,7 @@ import org.apache.hadoop.hive.ql.metadata.Table;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hive.hcatalog.common.HCatException;
 import org.apache.hive.hcatalog.common.HCatUtil;
+import org.apache.hive.hcatalog.data.schema.HCatFieldSchema;
 import org.apache.hive.hcatalog.data.schema.HCatSchema;
 import org.apache.thrift.TException;
 import org.slf4j.Logger;
@@ -51,6 +52,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -70,12 +72,12 @@ public class CascadingHCatUtil {
 	 * @param jobConf
 	 * @return A list of locations
 	 */
-	public static List<String> getDataStorageLocation(String db, String table,
+	public static List<DataStorageLocation> getDataStorageLocation(String db, String table,
 			String filter, JobConf jobConf) {
 		Preconditions.checkNotNull(table, "Table name must not be null");
 
 		HiveMetaStoreClient client = null;
-		List<String> locations = new ArrayList<String>();
+		List<DataStorageLocation> locations = new ArrayList<DataStorageLocation>();
 
 		try {
 			client = getHiveMetaStoreClient(jobConf);
@@ -93,7 +95,9 @@ public class CascadingHCatUtil {
 						// something
 						// like ds >= 1234
 						for (Partition part : parts) {
-							locations.add(part.getSd().getLocation());
+                            DataStorageLocation location = new DataStorageLocation(
+                                part.getSd().getLocation(),part.getValues());
+                            locations.add(location);
 						}
 					} else {
 						logError("Table " + hiveTable.getTableName()
@@ -107,7 +111,9 @@ public class CascadingHCatUtil {
 									+ filter, null);
 				}
 			} else {
-				locations.add(hiveTable.getTTable().getSd().getLocation());
+                DataStorageLocation location = new DataStorageLocation(
+                    hiveTable.getTTable().getSd().getLocation(), new LinkedList<String>());
+                locations.add(location);
 			}
 		} catch (IOException e) {
 			logError("Error occured when getting hiveconf", e);

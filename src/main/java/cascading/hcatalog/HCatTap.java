@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -139,17 +140,17 @@ public class HCatTap extends Tap<JobConf, RecordReader, OutputCollector> {
 
 	@Override
 	public void sinkConfInit(FlowProcess<JobConf> process, JobConf conf) {
-		List<String> pathes = new ArrayList<String>();
+		List<DataStorageLocation> paths = new ArrayList<DataStorageLocation>();
 
-		// Write to the same location as the where current table is stored
+		// Write to the same path as the where current table is stored
 		if (path == null) {
-			pathes = CascadingHCatUtil.getDataStorageLocation(db, table,
+			paths = CascadingHCatUtil.getDataStorageLocation(db, table,
 					filter, conf);
 		} else {
-			pathes.add(path);
+			paths.add(new DataStorageLocation(path, new LinkedList<String>()));
 		}
 
-		tap = TapFactory.createSinkTap(getScheme(), pathes);
+		tap = TapFactory.createSinkTap(getScheme(), paths);
 		tap.sinkConfInit(process, conf);
 	}
 
@@ -194,7 +195,7 @@ public class HCatTap extends Tap<JobConf, RecordReader, OutputCollector> {
 	public boolean commitResource(JobConf conf) throws IOException {
 		if (path != null) {
 			if (tap.commitResource(conf)) {
-				// Set the path as the new table location
+				// Set the path as the new table path
 				return CascadingHCatUtil.setDataStorageLocation(db, table,
 						filter, path, conf);
 			}

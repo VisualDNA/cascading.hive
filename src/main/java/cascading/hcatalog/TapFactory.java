@@ -28,11 +28,11 @@ class TapFactory {
 	 * Get the corresponding source {@link Tap}
 	 * 
 	 * @param scheme
-	 * @param paths
+	 * @param locations
 	 * @return a single Tap or a MultiSourceTap
 	 */
-	public static Tap createSourceTap(Scheme scheme, List<String> paths) {
-		return createTap(scheme, paths, true);
+	public static Tap createSourceTap(Scheme scheme, List<DataStorageLocation> locations) {
+		return createTap(scheme, locations, true);
 	}
 
     /**
@@ -42,23 +42,26 @@ class TapFactory {
      * @param paths
      * @return  a single Tap or a MultiSinkTap
      */
-	public static Tap createSinkTap(Scheme scheme, List<String> paths) {
+	public static Tap createSinkTap(Scheme scheme, List<DataStorageLocation> paths) {
 		return createTap(scheme, paths, false);
 	}
 
-	private static Tap createTap(Scheme scheme, List<String> paths,
+	private static Tap createTap(Scheme scheme, List<DataStorageLocation> locations,
                                  boolean source) {
-		int size = paths.size();
+		int size = locations.size();
 
 		if (size == 1) {
 			// Non-partitioned table
-			return new Hfs(scheme, paths.get(0));
+			return new Hfs(scheme, locations.get(0).path);
 		} else {
 			Tap[] taps = new Tap[size];
 
 			for (int i = 0; i < size; i++) {
 				// one tap per partition
-				taps[i] = new Hfs(scheme, paths.get(i));
+                DataStorageLocation location = locations.get(i);
+                DefaultHCatScheme hCatScheme = (DefaultHCatScheme) scheme;
+                hCatScheme.setLocation(location);
+                taps[i] = new Hfs(scheme, location.path);
 			}
 
 			// Get source tap
