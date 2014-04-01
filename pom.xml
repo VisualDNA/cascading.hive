@@ -51,12 +51,12 @@
 			<email>bishao@ebay.com</email>
 			<url></url>
 		</developer>
-        <developer>
-            <id>tao</id>
-            <name>Tao Xiao</name>
-            <email>taxiao@ebay.com</email>
-            <url></url>
-        </developer>
+        	<developer>
+            		<id>tao</id>
+            		<name>Tao Xiao</name>
+            		<email>taxiao@ebay.com</email>
+            		<url></url>
+        	</developer>
 	</developers>
 
 	<repositories>
@@ -69,6 +69,25 @@
 			<url>http://oss.sonatype.org/content/repositories/releases</url>
 		</repository>
 	</repositories>
+
+	<distributionManagement>
+		<repository>
+			<id>visualdna-releases</id>
+			<name>VisualDNA Releases</name>
+			<url>
+				https://maven.visualdna.com/nexus/content/repositories/releases
+			</url>
+			<layout>default</layout>
+		</repository>
+		<snapshotRepository>
+			<id>visualdna-snapshots</id>
+			<name>VisualDNA Snapshots</name>
+			<url>
+				https://maven.visualdna.com/nexus/content/repositories/snapshots
+			</url>
+			<layout>default</layout>
+		</snapshotRepository>
+	</distributionManagement>
 
     <profiles>
         <profile>
