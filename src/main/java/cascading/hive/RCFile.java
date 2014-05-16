@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
@@ -266,6 +267,14 @@ public class RCFile extends Scheme<JobConf, RecordReader, OutputCollector, Objec
             value = (int) ((LazyByte) value).getWritableObject().get();
         } else if (value instanceof LazyShort) {
             value = ((LazyShort) value).getWritableObject().get();
+        } else if (value instanceof LazyArray) {
+            LazyArray lazyArray = ((LazyArray) value);
+            List<Object> result = new ArrayList<Object>(lazyArray.getListLength());
+            for(int i = 0; i < lazyArray.getListLength(); i++) {
+                Object element = lazyArray.getListElementObject(i);
+                result.add(i, sourceField(element));
+            }
+            value = result;
         }
         //TODO: need handle more types
         return value;
