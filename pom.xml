@@ -38,8 +38,9 @@
 		<targetJdk>1.6</targetJdk>
 		<java.version>1.6</java.version>
         <hadoop1.version>1.2.1</hadoop1.version>
-		<hadoop2.version>2.2.0</hadoop2.version>
-		<cascading.version>2.0.2</cascading.version>
+		<hadoop2.version>2.3.0-cdh5.0.2</hadoop2.version>
+		<hadoop2core.version>2.3.0-mr1-cdh5.0.2</hadoop2core.version>
+		<cascading.version>2.5.4</cascading.version>
 		<hive.version>0.12.0</hive.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -68,6 +69,10 @@
 			<id>releases.sonatype.org</id>
 			<url>http://oss.sonatype.org/content/repositories/releases</url>
 		</repository>
+        <repository>
+            <id>cloudera</id>
+            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+        </repository>
 	</repositories>
 
 	<distributionManagement>
@@ -115,7 +120,7 @@
             <dependencies>
                 <dependency>
                     <groupId>cascading</groupId>
-                    <artifactId>cascading-hadoop2-mr1</artifactId>
+                    <artifactId>cascading-hadoop</artifactId>
                     <version>${cascading.version}</version>
                     <scope>provided</scope>
                 </dependency>
@@ -127,13 +132,13 @@
                 </dependency>
                 <dependency>
                     <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-mapreduce-client-core</artifactId>
-                    <version>${hadoop2.version}</version>
+                    <artifactId>hadoop-core</artifactId>
+                    <version>${hadoop2core.version}</version>
                     <scope>provided</scope>
                 </dependency>
                 <dependency>
                     <groupId>org.apache.hadoop</groupId>
-                    <artifactId>hadoop-mapreduce-client-common</artifactId>
+                    <artifactId>hadoop-common</artifactId>
                     <version>${hadoop2.version}</version>
                     <scope>test</scope>
                 </dependency>
