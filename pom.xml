@@ -35,12 +35,12 @@
 	<version>0.0.5-vdna-SNAPSHOT</version>
 	<name>Cascading adapters for Hive and HCatalog</name>
 	<properties>
-		<targetJdk>1.6</targetJdk>
-		<java.version>1.6</java.version>
+		<targetJdk>1.7</targetJdk>
+		<java.version>1.7</java.version>
         <hadoop1.version>1.2.1</hadoop1.version>
 		<hadoop2.version>2.3.0-cdh5.0.2</hadoop2.version>
 		<hadoop2core.version>2.3.0-mr1-cdh5.0.2</hadoop2core.version>
-		<cascading.version>2.5.4</cascading.version>
+		<cascading.version>2.5.5</cascading.version>
 		<hive.version>0.12.0</hive.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -52,12 +52,12 @@
 			<email>bishao@ebay.com</email>
 			<url></url>
 		</developer>
-        	<developer>
-            		<id>tao</id>
-            		<name>Tao Xiao</name>
-            		<email>taxiao@ebay.com</email>
-            		<url></url>
-        	</developer>
+      <developer>
+        <id>tao</id>
+        <name>Tao Xiao</name>
+        <email>taxiao@ebay.com</email>
+        <url></url>
+      </developer>
 	</developers>
 
 	<repositories>
@@ -69,11 +69,17 @@
 			<id>releases.sonatype.org</id>
 			<url>http://oss.sonatype.org/content/repositories/releases</url>
 		</repository>
-        <repository>
-            <id>cloudera</id>
-            <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
-        </repository>
-	</repositories>
+      <repository>
+        <id>cloudera</id>
+        <url>https://repository.cloudera.com/artifactory/cloudera-repos/</url>
+      </repository>
+    <repository>
+      <id>visualdna-releases</id>
+      <name>visualdna-releases</name>
+      <url>https://maven.visualdna.com/nexus/content/repositories/releases</url>
+    </repository>
+
+  </repositories>
 
 	<distributionManagement>
 		<repository>
@@ -173,12 +179,22 @@
                 </exclusion>
             </exclusions>
 		</dependency>
-		<dependency>
+    <dependency>
+      <groupId>com.twitter</groupId>
+      <artifactId>scalding-core_2.10</artifactId>
+      <version>0.11.1-cdh5</version>
+    </dependency>
+    <dependency>
 			<groupId>org.apache.hive.hcatalog</groupId>
 			<artifactId>hcatalog-core</artifactId>
 			<version>${hive.version}</version>
 		</dependency>
-		<dependency>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-library</artifactId>
+      <version>2.10.4</version>
+    </dependency>
+    <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.6.1</version>
@@ -209,17 +225,51 @@
 		</dependency>
 	</dependencies>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.scala-tools</groupId>
+        <artifactId>maven-scala-plugin</artifactId>
+        <version>2.9.1</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <sourceDir>src/main/scala</sourceDir>
+          <jvmArgs>
+            <jvmArg>-Xms64m</jvmArg>
+            <jvmArg>-Xmx1024m</jvmArg>
+          </jvmArgs>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>visualdna-releases</id>
+      <name>VisualDNA Releases</name>
+      <url>https://maven.visualdna.com/nexus/content/repositories/releases</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>scala-tools.org</id>
+      <name>Scala-tools Maven2 Repository</name>
+      <url>http://scala-tools.org/repo-releases</url>
+    </pluginRepository>
+  </pluginRepositories>
+
 </project>
