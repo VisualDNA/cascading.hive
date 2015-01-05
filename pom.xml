@@ -159,6 +159,12 @@
 			<version>${cascading.version}</version>
 			<scope>provided</scope>
 		</dependency>
+    <dependency>
+			<groupId>cascading</groupId>
+			<artifactId>cascading-local</artifactId>
+			<version>${cascading.version}</version>
+			<scope>provided</scope>
+		</dependency>
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>

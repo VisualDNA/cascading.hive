@@ -3,7 +3,7 @@ package cascading.hive
 import java.io.{OutputStream, InputStream}
 import java.util.Properties
 
-import cascading.scheme.hadoop.TextDelimited
+import cascading.scheme.local.TextDelimited
 import cascading.scheme.Scheme
 import com.twitter.scalding.FixedPathSource
 import org.apache.hadoop.mapred.{OutputCollector, RecordReader, JobConf}
