@@ -32,7 +32,7 @@
 	<groupId>com.ebay</groupId>
 	<artifactId>cascading-hive</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.5-vdna</version>
+	<version>0.0.6-vdna-SNAPSHOT</version>
 	<name>Cascading adapters for Hive and HCatalog</name>
 	<properties>
 		<targetJdk>1.7</targetJdk>
