@@ -12,23 +12,10 @@
  * limitations under the License.
  */
 
-/*
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package cascading.hcatalog;
 
 import cascading.flow.FlowProcess;
+import cascading.scheme.Scheme;
 import cascading.tap.SinkMode;
 import cascading.tap.Tap;
 import cascading.tuple.Fields;
@@ -52,7 +39,9 @@ import java.util.List;
  */
 @SuppressWarnings("serial")
 public class HCatTap extends Tap<JobConf, RecordReader, OutputCollector> {
-	/** Field LOG */
+    public static final String IGNORE_FILE_IN_PARTITION_REGEX = "hive-tap.path.partition.file.ignore-regex";
+
+    /** Field LOG */
 	private static final Logger LOG = LoggerFactory.getLogger(HCatTap.class);
 
 	private String db;
@@ -100,8 +89,10 @@ public class HCatTap extends Tap<JobConf, RecordReader, OutputCollector> {
 	 * @param sinkMode 
 	 */
 	public HCatTap(String db, String table, String filter,
-			HCatScheme hCatScheme, String path, Fields sourceField,
-			SinkMode sinkMode) {
+                   Scheme<JobConf,RecordReader,OutputCollector,?,?> hCatScheme,
+                   String path,
+                   Fields sourceField,
+			       SinkMode sinkMode) {
 		super(hCatScheme, sinkMode);
 
 		// Use the default scheme if it is null
@@ -140,14 +131,14 @@ public class HCatTap extends Tap<JobConf, RecordReader, OutputCollector> {
 
 	@Override
 	public void sinkConfInit(FlowProcess<JobConf> process, JobConf conf) {
-		List<DataStorageLocation> paths = new ArrayList<DataStorageLocation>();
+		List<String> paths = new ArrayList<>();
 
 		// Write to the same path as the where current table is stored
 		if (path == null) {
 			paths = CascadingHCatUtil.getDataStorageLocation(db, table,
 					filter, conf);
 		} else {
-			paths.add(new DataStorageLocation(path, new LinkedList<String>()));
+			paths.add(path);
 		}
 
 		tap = TapFactory.createSinkTap(getScheme(), paths);
@@ -193,14 +184,14 @@ public class HCatTap extends Tap<JobConf, RecordReader, OutputCollector> {
 
 	@Override
 	public boolean commitResource(JobConf conf) throws IOException {
-		if (path != null) {
-			if (tap.commitResource(conf)) {
-				// Set the path as the new table path
-				return CascadingHCatUtil.setDataStorageLocation(db, table,
-						filter, path, conf);
-			}
-		}
-
-		return false;
-	}
+        if (tap.commitResource(conf)) {
+            if (path != null) {
+                // Set the path as the new table location
+                return CascadingHCatUtil.setDataStorageLocation(db, table, filter, path, conf);
+            }
+            return true;
+		} else {
+            return false;
+        }
+    }
 }

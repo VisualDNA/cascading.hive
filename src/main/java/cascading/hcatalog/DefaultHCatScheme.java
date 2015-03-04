@@ -15,29 +15,22 @@
 package cascading.hcatalog;
 
 import cascading.cascade.CascadeException;
-import cascading.flow.FlowProcess;
-import cascading.scheme.SinkCall;
 import cascading.tuple.Fields;
 import cascading.tuple.FieldsResolverException;
 import cascading.tuple.Tuple;
 import org.apache.hadoop.hive.ql.metadata.Table;
-import org.apache.hadoop.hive.serde2.Deserializer;
 import org.apache.hadoop.hive.serde2.SerDe;
 import org.apache.hadoop.hive.serde2.SerDeException;
 import org.apache.hadoop.hive.serde2.objectinspector.ObjectInspector;
 import org.apache.hadoop.io.Writable;
-import org.apache.hadoop.mapred.InputFormat;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputCollector;
-import org.apache.hadoop.mapred.OutputFormat;
 import org.apache.hive.hcatalog.data.HCatRecord;
 import org.apache.hive.hcatalog.data.LazyHCatRecord;
 import org.apache.hive.hcatalog.data.schema.HCatFieldSchema;
 import org.apache.hive.hcatalog.data.schema.HCatSchema;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -78,23 +71,6 @@ public class DefaultHCatScheme extends HCatScheme {
 		super(db, table, filter, sourceFields);
 	}
 
-    public void setLocation(DataStorageLocation location) {
-        this.location = location;
-    }
-
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see
-     * cascading.hcatalog.scheme.HCatScheme#getTableInputFormat(java.lang.String
-     * , java.lang.String, java.lang.String, org.apache.hadoop.mapred.JobConf)
-     */
-	@Override
-	protected Class<? extends InputFormat> getTableInputFormat(Table table,
-			String filter, JobConf conf) {
-		return table.getInputFormatClass();
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -106,8 +82,7 @@ public class DefaultHCatScheme extends HCatScheme {
 	@Override
 	protected HCatSchema getTableHCatSchema(Table table, String filter,
 			JobConf conf) {
-
-		return CascadingHCatUtil.buildHCatSchema(table.getAllCols());
+		return CascadingHCatUtil.buildHCatSchema(table.getCols());
 	}
 
 	/*
@@ -119,15 +94,11 @@ public class DefaultHCatScheme extends HCatScheme {
 	 */
 	@Override
 	protected void readValue(Tuple tuple, Object value) {
-		Table table = getHiveTable();
 		HCatSchema hCatSchema = getHCatSchema();
-
-		Deserializer deserializer = table.getDeserializer();
-
 		try {
-			Object object = deserializer.deserialize((Writable) value);
-			HCatRecord hCatRecord = new LazyHCatRecord(object, deserializer.getObjectInspector());
-            HCatRecordWrapper record = new HCatRecordWrapper(hCatRecord, location.partitions);
+			Object object = getSerDe().deserialize((Writable) value);
+			HCatRecord record = new LazyHCatRecord(object,
+                    getSerDe().getObjectInspector());
 
 			Fields fields = getSourceFields();
 
@@ -140,31 +111,6 @@ public class DefaultHCatScheme extends HCatScheme {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * cascading.hcatalog.scheme.HCatScheme#getTableOutputFormat(org.apache.
-	 * hadoop.hive.ql.metadata.Table, java.lang.String,
-	 * org.apache.hadoop.mapred.JobConf)
-	 */
-	@Override
-	protected Class<? extends OutputFormat> getTableOutputFormat(
-			Table hiveTable, String filter, JobConf conf) {
-		return hiveTable.getOutputFormatClass();
-	}
-
-	@Override
-	public void sinkPrepare(FlowProcess<JobConf> flowProcess,
-			SinkCall<Object[], OutputCollector> sinkCall) throws IOException {
-		super.sinkPrepare(flowProcess, sinkCall);
-
-		List<Object> context = new ArrayList<Object>(Arrays.asList(sinkCall.getContext()));
-		context.add(new ArrayList<Object>());
-		context.add(getHCatSchema().getFields());
-		
-		sinkCall.setContext(context.toArray());
-	}
 
 	/*
 	 * (non-Javadoc)
@@ -175,7 +121,6 @@ public class DefaultHCatScheme extends HCatScheme {
 	 */
 	@Override
 	protected void writeValue(Tuple tuple, Fields fields, Object[] context, OutputCollector output) throws IOException {
-		Table table = getHiveTable();
 		List<HCatFieldSchema> tableFields = (List<HCatFieldSchema>) context[2];
 		
 		List<Object> content = (List<Object>) context[1];
@@ -196,7 +141,7 @@ public class DefaultHCatScheme extends HCatScheme {
 		
 		// Deserializer and Serializer of the same table
 		// should be the same.
-		SerDe serializer = (SerDe) table.getDeserializer();
+		SerDe serializer = (SerDe) getSerDe();
 		try {
 			output.collect(null, serializer.serialize(content, (ObjectInspector) context[0]));
 		} catch (SerDeException e) {
@@ -205,24 +150,4 @@ public class DefaultHCatScheme extends HCatScheme {
 			throw new CascadeException("Error occured when writing data out", e);
 		}
 	}
-
-    private class HCatRecordWrapper {
-        private final HCatRecord record;
-        private final Map<String, String> partitions;
-
-        private HCatRecordWrapper(HCatRecord record, Map<String, String> partitions) {
-            this.record = record;
-            this.partitions = partitions;
-        }
-
-        public Object get(String fieldName, HCatSchema schema) {
-            if(partitions.containsKey(fieldName)) {
-                return partitions.get(fieldName);
-            } else {
-                int idx = schema.getPosition(fieldName) - partitions.size();
-                return record.get(idx);
-            }
-        }
-    }
-
 }
