@@ -29,7 +29,7 @@
 		<hadoop2core.version>2.3.0-mr1-cdh5.0.2</hadoop2core.version>
 		<cascading.version>2.6.0</cascading.version>
 		<hive.version>0.13.1</hive.version>
-		<scalding.version>0.11.2</scalding.version>
+		<scalding.version>0.13.1</scalding.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 

@@ -397,7 +397,7 @@
     </snapshotRepository>
   </distributionManagement>
   <properties>
-    <scalding.version>0.11.2</scalding.version>
+    <scalding.version>0.13.1</scalding.version>
     <hadoop1.version>1.2.1</hadoop1.version>
     <cascading.version>2.6.0</cascading.version>
     <hive.version>0.13.1</hive.version>
