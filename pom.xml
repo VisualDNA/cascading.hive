@@ -18,7 +18,7 @@
 	<groupId>com.ebay</groupId>
 	<artifactId>cascading-hive</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1.1-vdna</version>
+	<version>0.1.2-vdna</version>
 	<name>Cascading adapters for Hive and HCatalog</name>
 	<properties>
 		<targetJdk>1.8</targetJdk>
@@ -29,7 +29,7 @@
 		<hadoop2core.version>2.3.0-mr1-cdh5.0.2</hadoop2core.version>
 		<cascading.version>2.6.0</cascading.version>
 		<hive.version>0.13.1</hive.version>
-		<scalding.version>0.13.1</scalding.version>
+		<scalding.version>0.15.0-cdh5-1</scalding.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -141,42 +141,37 @@
     </profiles>
 
 	<dependencies>
-		<dependency>
-			<groupId>cascading</groupId>
-			<artifactId>cascading-core</artifactId>
-			<version>${cascading.version}</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.twitter</groupId>
-			<artifactId>scalding-core_${scala.version}</artifactId>
-			<version>${scalding.version}</version>
-            <scope>provided</scope>
-		</dependency>
-        <dependency>
-            <groupId>com.google.protobuf</groupId>
-            <artifactId>protobuf-java</artifactId>
-            <version>2.5.0</version>
-        </dependency>
-		<dependency>
-			<groupId>org.apache.hive</groupId>
-			<artifactId>hive-exec</artifactId>
-			<version>${hive.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.google.protobuf</groupId>
-                    <artifactId>protobuf-java</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.antlr</groupId>
-                    <artifactId>antlr</artifactId>
-                </exclusion>
-            </exclusions>
-		</dependency>
     <dependency>
-      <groupId>com.twitter</groupId>
-      <artifactId>scalding-core_2.11</artifactId>
-      <version>0.11.1-cdh5</version>
+        <groupId>cascading</groupId>
+        <artifactId>cascading-core</artifactId>
+        <version>${cascading.version}</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.twitter</groupId>
+        <artifactId>scalding-core_${scala.version}</artifactId>
+        <version>${scalding.version}</version>
+        <scope>provided</scope>
+    </dependency>
+    <dependency>
+        <groupId>com.google.protobuf</groupId>
+        <artifactId>protobuf-java</artifactId>
+        <version>2.5.0</version>
+    </dependency>
+    <dependency>
+        <groupId>org.apache.hive</groupId>
+        <artifactId>hive-exec</artifactId>
+        <version>${hive.version}</version>
+        <exclusions>
+            <exclusion>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+            </exclusion>
+            <exclusion>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr</artifactId>
+            </exclusion>
+        </exclusions>
     </dependency>
     <dependency>
 			<groupId>org.apache.hive.hcatalog</groupId>
