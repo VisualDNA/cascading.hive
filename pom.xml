@@ -18,7 +18,7 @@
 	<groupId>com.ebay</groupId>
 	<artifactId>cascading-hive</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1.2-vdna</version>
+	<version>0.1.3-vdna</version>
 	<name>Cascading adapters for Hive and HCatalog</name>
 	<properties>
 		<targetJdk>1.8</targetJdk>
@@ -29,7 +29,7 @@
 		<hadoop2core.version>2.3.0-mr1-cdh5.0.2</hadoop2core.version>
 		<cascading.version>2.6.0</cascading.version>
 		<hive.version>0.13.1</hive.version>
-		<scalding.version>0.15.0-cdh5-1</scalding.version>
+		<scalding.version>0.15.0</scalding.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
@@ -162,6 +162,7 @@
         <groupId>org.apache.hive</groupId>
         <artifactId>hive-exec</artifactId>
         <version>${hive.version}</version>
+        <scope>provided</scope>
         <exclusions>
             <exclusion>
                 <groupId>com.google.protobuf</groupId>
@@ -177,6 +178,7 @@
 			<groupId>org.apache.hive.hcatalog</groupId>
 			<artifactId>hive-hcatalog-core</artifactId>
 			<version>${hive.version}</version>
+      <scope>provided</scope>
 		</dependency>
     <dependency>
       <groupId>org.scala-lang</groupId>
