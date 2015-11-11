@@ -18,7 +18,7 @@
 	<groupId>com.ebay</groupId>
 	<artifactId>cascading-hive</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1.3-vdna</version>
+	<version>0.1.4-vdna-SNAPSHOT</version>
 	<name>Cascading adapters for Hive and HCatalog</name>
 	<properties>
 		<targetJdk>1.8</targetJdk>
